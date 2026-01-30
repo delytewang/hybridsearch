@@ -8,13 +8,76 @@
 
 **支持多种存储后端和 Embedding 提供商，开箱即用。**
 
+## 安装
+
+```bash
+npm install hybridsearch
+# 或
+pnpm add hybridsearch
+```
+
+## 快速开始
+
+```typescript
+import { HybridSearch } from "hybridsearch";
+
+// 创建索引
+const search = await HybridSearch.create({
+  dir: "./docs",           // 索引目录
+  storage: "./.hybridsearch.db",
+  embedding: {
+    provider: "openai",
+    model: "text-embedding-3-small",
+    apiKey: process.env.OPENAI_API_KEY,
+  },
+});
+
+// 搜索
+const results = await search.search("查询内容", { maxResults: 10 });
+
+for (const r of results) {
+  console.log(`${r.score.toFixed(3)} ${r.path}:${r.startLine}`);
+  console.log(`  ${r.snippet}`);
+}
+```
+
+## 项目结构
+
+```
+hybridsearch/
+├── src/
+│   ├── index.ts              # 主入口
+│   ├── types.ts              # 类型定义
+│   ├── storage/              # 存储后端
+│   │   ├── factory.ts
+│   │   ├── sqlite/           # SQLite + sqlite-vec
+│   │   └── postgres/         # PostgreSQL + pgvector
+│   ├── embedding/            # Embedding 提供商
+│   │   ├── factory.ts
+│   │   ├── openai.ts
+│   │   ├── gemini.ts
+│   │   ├── siliconflow.ts
+│   │   └── ollama.ts
+│   ├── search/               # 搜索模块
+│   │   ├── vector.ts         # 向量搜索
+│   │   ├── keyword.ts        # 关键词搜索
+│   │   └── hybrid.ts         # 混合搜索
+│   ├── chunking/             # 工具
+│   │   └── markdown.ts       # Markdown 分块
+│   └── watcher/              # 文件监听
+│       └── index.ts
+├── package.json
+├── tsconfig.json
+└── README.md
+```
+
 ## 技术栈
 
 | 组件 | 技术 |
 |------|------|
 | **向量存储** | SQLite + sqlite-vec **或** PostgreSQL + pgvector |
 | **全文搜索** | SQLite FTS5 + BM25 **或** PostgreSQL Full Text Search |
-| **Embedding** | OpenAI / Gemini / SiliconFlow / Ollama / Local |
+| **Embedding** | OpenAI / Gemini / SiliconFlow / Ollama |
 | **文件监听** | chokidar |
 | **语言** | TypeScript / Node.js |
 
@@ -32,72 +95,15 @@
 | **OpenAI** | 云 API | text-embedding-3-small/large | 稳定、成熟 |
 | **Google Gemini** | 云 API | text-embedding-004 | 高质量 |
 | **SiliconFlow** | 云 API | BAAI/bge-large-zh | 国内访问快、支持中文 |
-| **Ollama** | 本地 | nomic-embed-text、mxbai-embed-large | 完全离线、私有化 |
-| **Local (llama.cpp)** | 本地 | embeddinggemma-300M | 轻量本地模型 |
+| **Ollama** | 本地 | nomic-embed-text | 完全离线、私有化 |
 
-## 硬件要求
+## 贡献
 
-### SQLite 模式
+欢迎提交 Issue 和 PR！
 
-| 模式 | CPU | 内存 | 存储 |
-|------|-----|------|------|
-| API 模式 | 任意 | 4GB+ | SSD |
-| 本地轻量 | 4核 | 16GB+ | NVMe SSD |
-| 本地生产 | 8核 | 32GB+ | NVMe SSD + GPU |
+## 许可证
 
-### PostgreSQL 模式
-
-| 模式 | CPU | 内存 | 存储 |
-|------|-----|------|------|
-| 开发 | 2核 | 8GB+ | SSD |
-| 生产 | 8核+ | 32GB+ | NVMe SSD + SSD 索引 |
-
-## 快速开始
-
-```bash
-npm install hybridsearch
-```
-
-### 1. SQLite + OpenAI
-
-```typescript
-import { HybridSearch } from "hybridsearch";
-
-const search = await HybridSearch.create({
-  dir: "./docs",
-  storage: "./.hybridsearch.db",
-  embedding: {
-    provider: "openai",
-    model: "text-embedding-3-small",
-    apiKey: process.env.OPENAI_API_KEY,
-  },
-});
-
-const results = await search.search("查询内容", { maxResults: 10 });
-```
-
-### 2. PostgreSQL + pgvector
-
-```typescript
-import { HybridSearch } from "hybridsearch";
-
-const search = await HybridSearch.create({
-  dir: "./docs",
-  storage: {
-    type: "postgresql",
-    host: "localhost",
-    port: 5432,
-    database: "hybridsearch",
-    user: "postgres",
-    password: process.env.POSTGRES_PASSWORD,
-    tablePrefix: "hs_",  // 表前缀，支持多租户
-  },
-  embedding: {
-    provider: "openai",
-    model: "text-embedding-3-small",
-    apiKey: process.env.OPENAI_API_KEY,
-  },
-});
+MIT
 ```
 
 ### 3. SiliconFlow (国内快速访问)
