@@ -5,7 +5,7 @@
 
 ## P0 - 基础架构 ✅
 - [x] ~~1. 初始化项目结构 (package.json, tsconfig.json)~~ (已有 README.md)
-- [ ] 2. 创建类型定义 (types.ts)
+- [x] 2. 创建类型定义 (types.ts) ✅ JUST NOW
 - [ ] 3. 实现存储抽象层 (storage/factory.ts)
 
 ## P0 - 存储后端 ⏳
