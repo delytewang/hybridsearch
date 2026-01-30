@@ -84,6 +84,7 @@ export class SiliconFlowEmbedding {
       "BAAI/bge-large-zh": 1024,
       "BAAI/bge-base-zh": 768,
       "BAAI/bge-small-zh": 512,
+      "BAAI/bge-m3": 1024,
       "thenlper/gte-large": 1024,
     };
     
